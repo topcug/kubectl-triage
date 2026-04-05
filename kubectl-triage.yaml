@@ -1,0 +1,56 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: triage
+spec:
+  version: v0.1.0
+  homepage: https://github.com/topcug/kubectl-triage
+  shortDescription: First-response context for suspicious Kubernetes workloads
+  description: |
+    kubectl-triage is a read-only kubectl plugin that collects the most useful
+    first checks for a pod, deployment, or job in a single command — without
+    jumping between ten different kubectl commands.
+
+    It is safe to run in production clusters. It never modifies cluster state.
+
+    Usage:
+      kubectl triage pod <n> -n <namespace>
+      kubectl triage deployment <n> -n <namespace>
+      kubectl triage job <n> -n <namespace>
+
+    Output formats: table (default), json, markdown
+  caveats: |
+    Requires read access to pods, events, logs, networkpolicies,
+    services, rolebindings, clusterrolebindings, and serviceaccounts.
+  platforms:
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_linux_amd64.tar.gz
+      sha256: ""
+      bin: kubectl-triage
+
+    - selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_linux_arm64.tar.gz
+      sha256: ""
+      bin: kubectl-triage
+
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_darwin_amd64.tar.gz
+      sha256: ""
+      bin: kubectl-triage
+
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_darwin_arm64.tar.gz
+      sha256: ""
+      bin: kubectl-triage
