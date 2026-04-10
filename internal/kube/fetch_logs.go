@@ -6,9 +6,10 @@ import (
 	"io"
 	"strings"
 
-	"github.com/topcug/kubectl-triage/pkg/types"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 const logTailLines = 30

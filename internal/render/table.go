@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/fatih/color"
+
 	"github.com/topcug/kubectl-triage/internal/triage"
 	"github.com/topcug/kubectl-triage/pkg/types"
 )

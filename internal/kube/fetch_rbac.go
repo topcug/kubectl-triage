@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/topcug/kubectl-triage/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 // FetchRBAC inspects RoleBindings and ClusterRoleBindings for the given service account.

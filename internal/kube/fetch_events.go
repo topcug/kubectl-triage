@@ -5,9 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/topcug/kubectl-triage/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 // FetchEvents returns recent events for a named object of the given kind.

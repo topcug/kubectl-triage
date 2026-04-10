@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/topcug/kubectl-triage/internal/kube"
-	"github.com/topcug/kubectl-triage/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/topcug/kubectl-triage/internal/kube"
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 // AssemblePod collects all sections of a TriageReport for a pod.

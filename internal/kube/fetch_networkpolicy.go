@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/topcug/kubectl-triage/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 // FetchNetwork checks NetworkPolicies and Services matching the given pod labels.

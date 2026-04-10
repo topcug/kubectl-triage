@@ -1,8 +1,9 @@
 package kube
 
 import (
-	"github.com/topcug/kubectl-triage/pkg/types"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/topcug/kubectl-triage/pkg/types"
 )
 
 // BuildOwnerChain walks the ownerReferences of a metav1.Object to build the chain.
