@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
 	"github.com/topcug/kubectl-triage/internal/kube"
 	"github.com/topcug/kubectl-triage/internal/render"
 	"github.com/topcug/kubectl-triage/internal/triage"
-	"github.com/spf13/cobra"
 )
 
 var podCmd = &cobra.Command{
