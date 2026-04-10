@@ -15,6 +15,7 @@ type TriageReport struct {
 	Logs            LogSnippet            `json:"logs"`
 	Network         NetworkSummary        `json:"network"`
 	RBAC            RBACSummary           `json:"rbac"`
+	SummaryBullets  []string              `json:"summaryBullets,omitempty"`
 	Recommendations []string              `json:"recommendations"`
 	TriageReadout   string                `json:"triageReadout,omitempty"`
 	GeneratedAt     time.Time             `json:"generatedAt"`

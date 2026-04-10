@@ -7,21 +7,37 @@ spec:
   homepage: https://github.com/topcug/kubectl-triage
   shortDescription: First-response context for suspicious Kubernetes workloads
   description: |
-    kubectl-triage is a read-only kubectl plugin that collects the most useful
-    first checks for a pod, deployment, or job in a single command — without
-    jumping between ten different kubectl commands.
+    kubectl-triage collapses the first 60 seconds of Kubernetes incident triage
+    into a single command — summary first, details after.
 
-    It is safe to run in production clusters. It never modifies cluster state.
+    It is read-only and safe to run in production clusters. It never modifies
+    cluster state.
+
+    Supported resources: pod, deployment, job
+    Output formats: table (default, coloured), json, markdown
 
     Usage:
       kubectl triage pod <n> -n <namespace>
       kubectl triage deployment <n> -n <namespace>
       kubectl triage job <n> -n <namespace>
 
-    Output formats: table (default), json, markdown
+    Flags:
+      --verbose  show full event list and owner chain
+      --quiet    show summary bullets and triage readout only
+      -o json    pipe-friendly JSON output
+      -o markdown paste into GitHub issues or incident docs
+
+    Exit codes:
+      0  no risk signals detected
+      1  error (not found, permission denied, timeout)
+      2  risk signals detected
   caveats: |
-    Requires read access to pods, events, logs, networkpolicies,
-    services, rolebindings, clusterrolebindings, and serviceaccounts.
+    Requires read access to: pods, pods/log, events, deployments, jobs,
+    serviceaccounts, networkpolicies, services, rolebindings,
+    clusterrolebindings, clusterroles.
+
+    If a permission is missing, the affected section shows a warning and
+    the rest of the report still renders.
   platforms:
     - selector:
         matchLabels:
@@ -54,3 +70,19 @@ spec:
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_darwin_arm64.tar.gz
       sha256: ""
       bin: kubectl-triage
+
+    - selector:
+        matchLabels:
+          os: windows
+          arch: amd64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_windows_amd64.zip
+      sha256: ""
+      bin: kubectl-triage.exe
+
+    - selector:
+        matchLabels:
+          os: windows
+          arch: arm64
+      uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_windows_arm64.zip
+      sha256: ""
+      bin: kubectl-triage.exe

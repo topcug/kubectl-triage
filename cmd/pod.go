@@ -20,9 +20,13 @@ var podCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 
+		if err := validateOutputFormat(outputFormat); err != nil {
+			return err
+		}
+
 		cs, err := kube.NewClient(kubeconfig, kubecontext)
 		if err != nil {
-			return fmt.Errorf("create client: %w", err)
+			return fmt.Errorf("cannot connect to cluster: %w", err)
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
@@ -30,16 +34,22 @@ var podCmd = &cobra.Command{
 
 		report, err := triage.AssemblePod(ctx, cs, name, namespace)
 		if err != nil {
-			return err
+			return fmt.Errorf("pod %q not found in namespace %q: %w", name, namespace, err)
 		}
 
 		switch outputFormat {
 		case "json":
-			return render.JSON(os.Stdout, report)
+			if err := render.JSON(os.Stdout, report); err != nil {
+				return err
+			}
 		case "markdown", "md":
 			render.Markdown(os.Stdout, report)
 		default:
-			render.Table(os.Stdout, report, verbose)
+			render.Table(os.Stdout, report, verbose, quiet)
+		}
+
+		if len(report.SummaryBullets) > 0 && report.SummaryBullets[0] != "no obvious risk signals detected" {
+			os.Exit(2)
 		}
 		return nil
 	},

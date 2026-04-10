@@ -12,6 +12,10 @@ build:
 test:
 	go test -race -count=1 ./...
 
+## fmt: format all Go source files
+fmt:
+	gofmt -w ./...
+
 ## lint: run golangci-lint (requires golangci-lint installed)
 lint:
 	golangci-lint run ./...
@@ -27,6 +31,9 @@ clean:
 ## release-snapshot: test goreleaser without publishing
 release-snapshot:
 	goreleaser release --snapshot --clean
+
+## snapshot: test goreleaser without publishing (alias)
+snapshot: release-snapshot
 
 ## help: print this help
 help:

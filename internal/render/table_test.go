@@ -58,7 +58,7 @@ func sampleReport() *types.TriageReport {
 
 func TestTableRender_ContainsKeyFields(t *testing.T) {
 	var buf bytes.Buffer
-	render.Table(&buf, sampleReport(), false)
+	render.Table(&buf, sampleReport(), false, false)
 	out := buf.String()
 
 	checks := []string{

@@ -20,15 +20,27 @@ var (
 
 // Table renders a compact, first-response triage screen.
 // Pass verbose=true to show full event list and owner chain.
-func Table(w io.Writer, r *types.TriageReport, verbose bool) {
+// Pass quiet=true to output summary bullets and triage readout only.
+func Table(w io.Writer, r *types.TriageReport, verbose, quiet bool) {
 	fmt.Fprintln(w)
 	heading.Fprintf(w, "══ kubectl-triage: %s/%s [%s] ══\n", r.Target.Namespace, r.Target.Name, r.Target.Kind)
 	faint.Fprintf(w, "   %s\n", r.GeneratedAt.Format("2006-01-02 15:04:05 UTC"))
 
 	// ── Summary ───────────────────────────────────────────────────
 	section(w, "Summary")
-	for _, b := range triage.BuildSummaryBullets(r) {
+	bullets := r.SummaryBullets
+	if len(bullets) == 0 {
+		bullets = triage.BuildSummaryBullets(r)
+	}
+	for _, b := range bullets {
 		warn.Fprintf(w, "  - %s\n", b)
+	}
+
+	if quiet {
+		fmt.Fprintln(w)
+		bold.Fprintln(w, "▸ Triage Readout")
+		fmt.Fprintf(w, "  %s\n\n", r.TriageReadout)
+		return
 	}
 
 	// ── Workload ──────────────────────────────────────────────────

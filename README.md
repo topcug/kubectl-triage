@@ -1,19 +1,39 @@
 # kubectl-triage
 
+**Collapse the first 60 seconds of Kubernetes incident triage into a single command.**
+
 <p align="center">
-  <img src="kubectl-triage.png" alt="kubectl-triage" width="400" />
+  <img src="kubectl-triage.png" alt="kubectl-triage" width="200" />
 </p>
 
-First-response context for suspicious Kubernetes workloads.
+[![CI](https://github.com/topcug/kubectl-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/topcug/kubectl-triage/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/topcug/kubectl-triage)](https://goreportcard.com/report/github.com/topcug/kubectl-triage)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-`kubectl-triage` is a read-only kubectl plugin that collapses the first 60 seconds of incident triage into a single command — summary first, details after.
+---
+
+## Before kubectl-triage
 
 ```bash
-kubectl triage pod suspicious-pod -n payments
+kubectl describe pod payment-api-7d9f8b-xkp2q -n payments
+kubectl get events -n payments --field-selector involvedObject.name=payment-api-7d9f8b-xkp2q
+kubectl logs payment-api-7d9f8b-xkp2q -n payments --tail=30
+kubectl get networkpolicy -n payments
+kubectl get rolebindings -n payments
 ```
 
+## After kubectl-triage
+
+```bash
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments
 ```
-══ kubectl-triage: payments/suspicious-pod [Pod] ══
+
+---
+
+## What you see in 60 seconds
+
+```
+══ kubectl-triage: payments/payment-api-7d9f8b-xkp2q [Pod] ══
    2026-04-05 17:00:00 UTC
 
 ▸ Summary
@@ -26,7 +46,7 @@ kubectl triage pod suspicious-pod -n payments
   - runAsNonRoot is not set
 
 ▸ Workload
-  Name                         suspicious-pod
+  Name                         payment-api-7d9f8b-xkp2q
   Namespace                    payments
   Kind                         Pod
   Phase                        Running
@@ -77,6 +97,140 @@ kubectl triage pod suspicious-pod -n payments
 
 ---
 
+## Install
+
+### Quickstart — go install
+
+```bash
+go install github.com/topcug/kubectl-triage@latest
+# Binary lands in $(go env GOPATH)/bin
+export PATH="$PATH:$(go env GOPATH)/bin"
+
+# Verify
+kubectl plugin list | grep triage
+kubectl triage --help
+```
+
+### Pre-built binary
+
+Download from [GitHub Releases](https://github.com/topcug/kubectl-triage/releases):
+
+```bash
+# Linux amd64
+curl -L https://github.com/topcug/kubectl-triage/releases/latest/download/kubectl-triage_linux_amd64.tar.gz \
+  | tar -xz kubectl-triage
+chmod +x kubectl-triage
+mv kubectl-triage ~/.local/bin/
+
+# macOS arm64 (Apple Silicon)
+curl -L https://github.com/topcug/kubectl-triage/releases/latest/download/kubectl-triage_darwin_arm64.tar.gz \
+  | tar -xz kubectl-triage
+chmod +x kubectl-triage
+mv kubectl-triage /usr/local/bin/
+```
+
+Verify the install:
+
+```bash
+kubectl plugin list | grep triage
+kubectl triage --help
+```
+
+### Krew _(planned v1.1)_
+
+```bash
+kubectl krew install triage
+```
+
+### Build from source
+
+```bash
+git clone https://github.com/topcug/kubectl-triage.git
+cd kubectl-triage
+make install   # installs to $(go env GOPATH)/bin
+```
+
+> **How kubectl plugins work:** kubectl discovers any executable on your `$PATH` whose name starts with `kubectl-`. No registration needed — place the binary and run `kubectl triage`.
+
+---
+
+## Usage
+
+### Real-world scenarios
+
+```bash
+# Pod is CrashLoopBackOff — what's happening?
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments
+
+# Deployment is stuck — replicas not coming up
+kubectl triage deployment payment-api -n payments
+
+# Batch job failed silently — why?
+kubectl triage job nightly-reconcile -n finance
+
+# Quick summary only — no full report
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments --quiet
+
+# Full report with owner chain and all events
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments --verbose
+
+# Pipe to jq in a CI script
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments -o json \
+  | jq '.summaryBullets[]'
+
+# Paste into a GitHub incident issue
+kubectl triage pod payment-api-7d9f8b-xkp2q -n payments -o markdown
+
+# Use a non-default context or kubeconfig
+kubectl triage pod payment-api -n payments --context staging
+kubectl triage pod payment-api -n payments --kubeconfig ~/.kube/other.yaml
+```
+
+### Aliases
+
+`deployment` can be shortened to `deploy` or `dep`:
+
+```bash
+kubectl triage deploy payment-api -n payments
+```
+
+---
+
+## Flags
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--namespace` | `-n` | `default` | Namespace of the target resource |
+| `--output` | `-o` | `table` | Output format: `table`, `json`, `markdown` |
+| `--verbose` | `-v` | `false` | Show full event list and owner chain |
+| `--quiet` | `-q` | `false` | Show summary bullets and triage readout only |
+| `--context` | | current context | Kubernetes context to use |
+| `--kubeconfig` | | `$KUBECONFIG` or `~/.kube/config` | Path to kubeconfig file |
+
+---
+
+## Output formats
+
+| Format | Flag | Use case |
+|--------|------|----------|
+| `table` | default | Terminal, on-call response |
+| `json` | `-o json` | `jq` pipelines, CI scripts, monitoring |
+| `markdown` | `-o markdown` | GitHub issues, Notion, Slack, incident docs |
+
+See [docs/output-format.md](docs/output-format.md) for the full JSON schema and exit code reference.
+
+---
+
+## Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Triage complete — no risk signals detected |
+| `1` | Error — resource not found, permission denied, or timeout |
+| `2` | Triage complete — risk signals detected |
+
+---
+
 ## What it collects
 
 | Section | Details |
@@ -84,119 +238,20 @@ kubectl triage pod suspicious-pod -n payments
 | **Summary** | Short risk bullet list — shown first, always |
 | **Workload** | Name, namespace, phase, node, ready/restarting status |
 | **Image** | All containers + init containers, `:latest` flag |
-| **Security** | privileged, runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation, added capabilities |
+| **Security** | privileged, runAsNonRoot, readOnlyRootFilesystem, allowPrivilegeEscalation, capabilities |
 | **Service Account** | Name, default SA detection, automount token status |
-| **Key Events** | Top 5 events, warnings prioritised — use `--verbose` for full list |
+| **Key Events** | Top 5 events, warnings prioritised — `--verbose` for full list |
 | **Log Tail** | Last 30 lines of the primary container |
 | **Network** | NetworkPolicy coverage, bound Services |
 | **RBAC** | RoleBindings and ClusterRoleBindings for the service account |
-| **Suggested Next Checks** | Action-oriented next steps — not compliance verdicts |
+| **Suggested Next Checks** | Action-oriented next steps |
 | **Triage Readout** | Single-sentence situational summary |
-
----
-
-## Why it exists
-
-When something looks suspicious, the first 3 minutes matter. Engineers typically run:
-
-```
-kubectl describe pod ...
-kubectl get events ...
-kubectl logs ...
-kubectl get networkpolicy ...
-kubectl get rolebindings ...
-```
-
-`kubectl-triage` collapses this into a single command — summary first, details after.
-
----
-
-## Install
-
-> **How kubectl plugins work:** kubectl discovers any executable on your `$PATH` whose name starts with `kubectl-`. No registration needed — copy the binary and you're done.
-
-### Option 1 — Build from source
-
-**Requirements:** Go 1.22+
-
-```bash
-git clone https://github.com/topcug/kubectl-triage.git
-cd kubectl-triage
-go build -o kubectl-triage ./main.go
-cp kubectl-triage ~/.local/bin/kubectl-triage
-
-# Verify
-kubectl plugin list | grep triage
-kubectl triage --help
-```
-
-### Option 2 — go install
-
-```bash
-go install github.com/topcug/kubectl-triage@latest
-# Binary lands in $(go env GOPATH)/bin — make sure that's on your PATH
-export PATH="$PATH:$(go env GOPATH)/bin"
-```
-
-### Option 3 — Krew _(planned v1.1)_
-
-```bash
-kubectl krew install triage
-```
-
-### Option 4 — Pre-built binary _(planned v0.2)_
-
-Download from [GitHub Releases](https://github.com/topcug/kubectl-triage/releases), make executable, place on PATH:
-
-```bash
-# Linux amd64 example
-tar -xzf kubectl-triage_linux_amd64.tar.gz
-chmod +x kubectl-triage
-mv kubectl-triage ~/.local/bin/
-```
-
----
-
-## Usage
-
-```bash
-# Triage a pod
-kubectl triage pod <n> -n <namespace>
-
-# Triage a deployment
-kubectl triage deployment <n> -n <namespace>
-
-# Triage a job
-kubectl triage job <n> -n <namespace>
-
-# Show full event list and owner chain
-kubectl triage pod <n> -n <namespace> --verbose
-
-# JSON output — pipe to jq or use in CI
-kubectl triage pod <n> -n <namespace> -o json
-
-# Markdown output — paste into incident docs, Slack, Notion
-kubectl triage pod <n> -n <namespace> -o markdown
-
-# Use a specific kubeconfig or context
-kubectl triage pod <n> -n <namespace> --context staging --kubeconfig ~/.kube/other.yaml
-```
-
-### Flags
-
-| Flag | Short | Default | Description |
-|------|-------|---------|-------------|
-| `--namespace` | `-n` | `default` | Namespace of the target resource |
-| `--output` | `-o` | `table` | Output format: `table`, `json`, `markdown` |
-| `--verbose` | `-v` | `false` | Show full event list and owner chain |
-| `--context` | | current context | Kubernetes context to use |
-| `--kubeconfig` | | `~/.kube/config` | Path to kubeconfig file |
 
 ---
 
 ## Required permissions
 
-`kubectl-triage` is read-only. It needs these permissions in the target namespace:
+kubectl-triage is **read-only**. It never modifies cluster state.
 
 ```
 pods, pods/log      — get
@@ -215,42 +270,59 @@ If a permission is missing, the affected section shows a graceful warning and th
 
 ---
 
+## Config file
+
+Create `.kubectl-triage.yaml` in your project directory or `$HOME`:
+
+```yaml
+defaultNamespace: production
+outputFormat: table
+timeoutSeconds: 15
+verbose: false
+quiet: false
+```
+
+---
+
 ## Design principles
 
-- **Summary first** — risk bullets and triage readout frame every output before the details.
+- **Summary first** — risk bullets and triage readout appear before details on every report.
 - **Read-only** — never modifies cluster state. No `exec`, `patch`, `cordon`, or `delete`.
 - **Fast** — 8-second total timeout. Partial results on permission errors.
-- **Scriptable** — `-o json` produces stable, parseable output for `jq` or CI pipelines.
+- **Scriptable** — `-o json` produces stable output for `jq` or CI pipelines.
 - **Kubernetes-native** — respects `KUBECONFIG`, `--context`, and `--namespace` like any kubectl command.
 - **Action-oriented** — every recommendation tells you what to do, not just what's wrong.
+
+---
+
+## When not to use
+
+kubectl-triage is a first-response tool, not a compliance scanner or cluster-wide audit tool. See [docs/when-not-to-use.md](docs/when-not-to-use.md) for details.
 
 ---
 
 ## Development
 
 ```bash
-git clone https://github.com/topcug/kubectl-triage.git
-cd kubectl-triage
-
+make fmt      # format code
 make test     # run tests with race detector
 make build    # produces ./bin/kubectl-triage
+make install  # installs to $(go env GOPATH)/bin
+make lint     # run golangci-lint
 ```
 
-After building, copy the binary to a directory on your `$PATH`:
-
-```bash
-cp bin/kubectl-triage ~/.local/bin/kubectl-triage
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ---
 
 ## Roadmap
 
 - [x] v0.1 — pod, deployment, job triage (table / json / markdown)
+- [x] v0.1 — CI pipeline, GoReleaser, Krew manifest
 - [ ] v0.2 — pre-built binaries on GitHub Releases
 - [ ] v0.3 — `kubectl triage namespace <n>` for namespace-wide summary
 - [ ] v1.1 — Krew index submission
-- [ ] v1.2 — configurable recommendation rules via `.kubectl-triage.yaml`
+- [ ] v1.2 — configurable rules via `.kubectl-triage.yaml`
 - [ ] v2.0 — `--diff` mode to compare two reports over time
 
 ---

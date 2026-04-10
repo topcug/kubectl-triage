@@ -50,6 +50,7 @@ func AssemblePod(ctx context.Context, cs kubernetes.Interface, name, ns string) 
 		RBAC:           rbac,
 		GeneratedAt:    time.Now().UTC(),
 	}
+	r.SummaryBullets = BuildSummaryBullets(r)
 	r.Recommendations = Recommend(r)
 	r.TriageReadout = BuildTriageReadout(r)
 	return r, nil
@@ -119,6 +120,7 @@ func AssembleDeployment(ctx context.Context, cs kubernetes.Interface, name, ns s
 		RBAC:           rbac,
 		GeneratedAt:    time.Now().UTC(),
 	}
+	r.SummaryBullets = BuildSummaryBullets(r)
 	r.Recommendations = Recommend(r)
 	r.TriageReadout = BuildTriageReadout(r)
 	return r, nil
@@ -172,6 +174,7 @@ func AssembleJob(ctx context.Context, cs kubernetes.Interface, name, ns string) 
 		RBAC:           rbac,
 		GeneratedAt:    time.Now().UTC(),
 	}
+	r.SummaryBullets = BuildSummaryBullets(r)
 	r.Recommendations = Recommend(r)
 	r.TriageReadout = BuildTriageReadout(r)
 	return r, nil
