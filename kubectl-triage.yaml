@@ -44,7 +44,7 @@ spec:
           os: linux
           arch: amd64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_linux_amd64.tar.gz
-      sha256: ""
+      sha256: "ffc3281794a91147f542815fc034b54915393cde6d1c4d1ccb9bc399e094f6e4"
       bin: kubectl-triage
 
     - selector:
@@ -52,7 +52,7 @@ spec:
           os: linux
           arch: arm64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_linux_arm64.tar.gz
-      sha256: ""
+      sha256: "8ff52175a2ec8cc714d69cd2862b508f86c3a5fa54f9eb46874d7ec109bfe84e"
       bin: kubectl-triage
 
     - selector:
@@ -60,7 +60,7 @@ spec:
           os: darwin
           arch: amd64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_darwin_amd64.tar.gz
-      sha256: ""
+      sha256: "0e51cc1229673900f759358bd4b194e1c80a3c5c56fac5017f84fb7f5eacdcb0"
       bin: kubectl-triage
 
     - selector:
@@ -68,7 +68,7 @@ spec:
           os: darwin
           arch: arm64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_darwin_arm64.tar.gz
-      sha256: ""
+      sha256: "73104d4a8dd141c301c2f4a907e3e0687ef9d84fbe8196d54f02e8d3aa3ddbf5"
       bin: kubectl-triage
 
     - selector:
@@ -76,7 +76,7 @@ spec:
           os: windows
           arch: amd64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_windows_amd64.zip
-      sha256: ""
+      sha256: "d884130ba69076cf1724a8b92b44ba794839b4254aca3dafe287c2ef31b250b2"
       bin: kubectl-triage.exe
 
     - selector:
@@ -84,5 +84,5 @@ spec:
           os: windows
           arch: arm64
       uri: https://github.com/topcug/kubectl-triage/releases/download/v0.1.0/kubectl-triage_windows_arm64.zip
-      sha256: ""
+      sha256: "f5a34503b21996797aea9233b0c151c5eed24bf0ad7e5ab0b0c41c10d9b29b54"
       bin: kubectl-triage.exe
