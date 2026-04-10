@@ -2,8 +2,6 @@ module github.com/topcug/kubectl-triage
 
 go 1.23.0
 
-toolchain go1.25.9
-
 require (
 	github.com/fatih/color v1.16.0
 	github.com/spf13/cobra v1.8.0
