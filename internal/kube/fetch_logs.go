@@ -30,7 +30,7 @@ func FetchLogs(ctx context.Context, cs kubernetes.Interface, podName, ns string,
 	if err != nil {
 		return types.LogSnippet{Container: target.Name, Error: fmt.Sprintf("stream logs: %v", err)}
 	}
-	defer rc.Close()
+	defer func() { _ = rc.Close() }()
 
 	raw, err := io.ReadAll(rc)
 	if err != nil {
