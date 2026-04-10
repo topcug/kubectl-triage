@@ -17,13 +17,6 @@ linters:
 formatters:
   enable:
     - gofmt
-
-formatters-settings:
-  gofmt:
-    simplify: true
-
-issues:
-  exclude-rules:
-    - path: _test\.go
-      linters:
-        - unparam
+  settings:
+    gofmt:
+      simplify: true
