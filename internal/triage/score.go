@@ -64,7 +64,7 @@ func Recommend(r *types.TriageReport) []string {
 	// Images
 	for _, img := range r.Images {
 		if img.IsLatest {
-			recs = append(recs, fmt.Sprintf("pin image %q to a fixed version — :latest may change unexpectedly", img.Container))
+			recs = append(recs, fmt.Sprintf("pin image %q to a fixed version — :latest may change unexpectedly", img.Image))
 			break
 		}
 	}
@@ -114,7 +114,7 @@ func BuildSummaryBullets(r *types.TriageReport) []string {
 	}
 	for _, img := range r.Images {
 		if img.IsLatest {
-			bullets = append(bullets, fmt.Sprintf("image uses :latest (%s)", img.Container))
+			bullets = append(bullets, fmt.Sprintf("image uses :latest (%s)", img.Image))
 			break
 		}
 	}
